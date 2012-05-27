@@ -5,6 +5,7 @@
     "express": "latest",
     "socket.io": "latest",
     "sugar": "latest",
-    "jsdom": "0.2.1"
+    "jsdom": "0.2.1",
+    "coffee-script": "latest"
   }
 }

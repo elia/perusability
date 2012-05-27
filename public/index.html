@@ -6,27 +6,26 @@
     <title>Perusability</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="http://sugarjs.com/download"></script>
+    <script src="/coffee-script.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost');
-      var log = console.log;
+    
+    <script type="text/coffeescript">
+      window.socket = io.connect('http://localhost')
+      window.log = console.log
       
-      socket.on('new-contents', function (data) {
-        console.log('NEW', data);
-        $('h1.title').html(data.title);
-        $('p.body').html(data.body);
+      socket.on 'new-contents', (data)->
+        console.log('NEW', data)
+        $('h1.title').html(data.title)
+        $('p.body').html(data.body)
         $('.info').html('updated!')
-      });
       
-      $(function() {
-        $('form').submit(function(event) {
-          var url = $('#url').val();
-          console.log(url);
-          event.preventDefault();
-          socket.emit('peruse-page', {uri: url});
-          $('.info').html('sent!');
-        });
-      });
+      $ ->
+        $('form').submit (event)->
+          uri = $('#url').val()
+          socket.emit('peruse-page', uri: uri)
+          $('.info').html('sent!')
+          event.preventDefault()
+          log(uri)
     </script>
   </head>
   
