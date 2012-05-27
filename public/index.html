@@ -12,6 +12,7 @@
       var log = console.log;
       
       socket.on('new-contents', function (data) {
+        console.log('NEW', data);
         $('h1.title').html(data.title);
         $('p.body').html(data.body);
         $('.info').html('updated!')

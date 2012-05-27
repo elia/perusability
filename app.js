@@ -1,31 +1,35 @@
 var port = process.env.PORT || 3000;
-
+var log = console.log;
 
 
 // SCRAPING
-var request = require('request');
-var url = require('url');
 var jsdom = require('jsdom');
-var jquery_uri = 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js';
-var sugar_uri = 'http://sugarjs.com/download';
+var jquery_uri = 'http://code.jquery.com/jquery-1.5.min.js';
 
-function scrape(uri) {
-  request({uri: uri}, function(error, response, body){
-    if (error && response.statusCode !== 200) { return false; };
-    
-    var title, body;
-    jsdom.env({
-      html: body,
-      scripts: [jquery_uri, sugar_uri]
-    }, function (error, window) {
-      var $ = window.jQuery;
-      title = $('h1')[0] || $('h2')[0];
-      body = $('p')[0];
-    });
-    
-    return {title: title, body: body};
+jsdom.defaultDocumentFeatures = {
+  FetchExternalResources   : false,
+  ProcessExternalResources : false,
+  MutationEvents           : false,
+  QuerySelector            : false
+};
+
+var scrape = function(uri, callback) {
+  console.log('SCRAPING: ', uri);
+  
+  var _title, _body;
+  jsdom.env("<html><body><h1>Ciao</h1><p>mondo!</p></body></html>", [jquery_uri], function (errors, window) {
+    // _title = window.$('h1').first().text();
+    // _body  = window.$('p').first().text();
+    // log('FOUND:', _title, _body);
+    // callback({title: _title, body: _body});
+    log('1');
+    // _body = window.document.body.innerHTML;
+    callback({title: 'Ciao', body: 'mondo', _body: _body});
+    log('2')
   });
-}
+  callback({title: 'Ciao', body: 'mondo', _body: _body});
+  callback({title: 'Ciao', body: 'mondo', _body: _body});
+};
 
 
 
@@ -43,21 +47,18 @@ app.configure(function(){
 
 // SOCKET IO
 
-var io = require('socket.io').listen(app)
-var fs = require('fs')
+var io = require('socket.io').listen(app);
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
   socket.on('peruse-page', function (data) {
     console.log(data);
-    socket.emit('new-contents', scrape(data.uri));
+    scrape(data.uri, function(contents) {
+      log('CONTENTS:', contents);
+      socket.emit('new-contents', contents);
+    });
   });
 });
 
-io.configure(function () { 
-  io.set("transports", ["xhr-polling"]); 
-  io.set("polling duration", 10); 
-});
 
 
 
